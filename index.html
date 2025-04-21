@@ -2,28 +2,88 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Modelo de Toxicidad con TensorFlow.js</title>
+    <title>Detección de Toxicidad</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.10.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
     <style>
       body {
-        font-family: Arial, sans-serif;
-        margin: 20px;
+        font-family: sans-serif;
+        background: #f4f4f4;
+        padding: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
-      #resultado {
-        margin-top: 20px;
+      textarea {
+        width: 400px;
+        height: 100px;
         padding: 10px;
-        border: 1px solid #ccc;
+        font-size: 16px;
+      }
+      button {
+        margin-top: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+      }
+      #output {
+        margin-top: 20px;
+        width: 400px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
       }
     </style>
   </head>
   <body>
-    <h1>Analizador de Toxicidad</h1>
-    <textarea id="oracion" placeholder="Ingrese una oración"></textarea>
-    <button onclick="analizarOracion()">Analizar</button>
-    <div id="resultado"></div>
+    <h1>Detector de Toxicidad con TensorFlow.js</h1>
+    <textarea
+      id="inputText"
+      placeholder="Escribe un texto para analizar..."
+    ></textarea>
+    <button onclick="analizarTexto()">Analizar</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
-    <script src="script.js"></script>
+    <div id="output"></div>
+
+    <script>
+      let modelo;
+      const umbral = 0.9;
+
+      async function cargarModelo() {
+        modelo = await toxicity.load(umbral);
+        console.log("Modelo cargado.");
+      }
+
+      async function analizarTexto() {
+        const texto = document.getElementById("inputText").value;
+        const output = document.getElementById("output");
+        output.innerHTML = "Analizando...";
+
+        if (!modelo) {
+          await cargarModelo();
+        }
+
+        modelo.classify([texto]).then((predicciones) => {
+          output.innerHTML = "<h3>Resultado:</h3>";
+          let hayToxicidad = false;
+
+          predicciones.forEach((p) => {
+            if (p.results[0].match) {
+              hayToxicidad = true;
+              output.innerHTML += `<p><strong>${
+                p.label
+              }</strong>: Positivo (confianza: ${(
+                p.results[0].probabilities[1] * 100
+              ).toFixed(2)}%)</p>`;
+            }
+          });
+
+          if (!hayToxicidad) {
+            output.innerHTML += `<p>✅ No se detectó toxicidad.</p>`;
+          }
+        });
+      }
+      cargarModelo();
+    </script>
   </body>
 </html>
