@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Modelo de Toxicidad con TensorFlow.js</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      #resultado {
+        margin-top: 20px;
+        padding: 10px;
+        border: 1px solid #ccc;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Analizador de Toxicidad</h1>
+    <textarea id="oracion" placeholder="Ingrese una oración"></textarea>
+    <button onclick="analizarOracion()">Analizar</button>
+    <div id="resultado"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/toxicity"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
